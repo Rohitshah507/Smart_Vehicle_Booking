@@ -6,9 +6,6 @@ const sendEmail = async ( email, {subject, message} ) => {
     throw new Error("Email recipient is missing");
   }
 
-  console.log(config.smtp_email);
-  console.log(config.smtp_password)
-
   const transporter = nodemailer.createTransport({
     service: "gmail",
     port: 465,

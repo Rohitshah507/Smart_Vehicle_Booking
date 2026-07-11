@@ -35,4 +35,21 @@ const createUser = async (data) => {
   return userData;
 };
 
-export { createUser };
+const loginService = async (data) => {
+  const user = await User.findOne({email: data.email}).select("+password");
+
+  if(!user){
+    throw {statusCode:404, message:"User not Found"};
+  }
+  console.log(user.email)
+
+  const isMatch = await bcrypt.compare(data.password, user.password);
+
+  if(!isMatch){
+    throw{StatusCode:404, message:"Invalid Credentials"}
+  }
+
+  return user;
+}
+
+export { createUser, loginService };

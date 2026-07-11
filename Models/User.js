@@ -15,11 +15,15 @@ const userSchema = new mongoose.Schema({
         const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
         return emailRegex.test(value);
       },
+      message: (email) => {
+        return `${email.value}is not a valid email address`;
+      },
     },
   },
   phoneNumber: {
     type: Number,
     required: true,
+    unique:true,
   },
   password: {
     type: String,
@@ -38,6 +42,13 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
+  isLoggedIn:{
+    type:Boolean,
+    default:false,
+  },
+  token:{
+    type:String
+  }
 });
 
 const User = mongoose.model("User", userSchema);
