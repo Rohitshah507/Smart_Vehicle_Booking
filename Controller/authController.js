@@ -1,5 +1,10 @@
 import User from "../Models/User.js";
-import { createUser, loginService } from "../Service/authService.js";
+import {
+  createUser,
+  loginService,
+  resetOTPService,
+  resetPasswordService,
+} from "../Service/authService.js";
 import { generateToken } from "../utils/token.js";
 
 const signUP = async (req, res) => {
@@ -82,12 +87,12 @@ const login = async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        success:false,
-        message: "Email and password are required"
+        success: false,
+        message: "Email and password are required",
       });
     }
 
-    const user = await loginService({email, password});
+    const user = await loginService({ email, password });
 
     if (!user.isOTPVerified) {
       return res.status(400).json("OTP is not verify yet");
@@ -116,10 +121,83 @@ const login = async (req, res) => {
     });
   } catch (error) {
     return res.status(500).json({
-      success:false,
-      message: `Error ${error.message}`
-    })
+      success: false,
+      message: `Error ${error.message}`,
+    });
   }
 };
 
-export default { signUP, verifyEmail, login };
+const resetOTP = async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      return res.status(400).json("Email is Required");
+    }
+    await resetOTPService(email);
+
+    return res.status(201).json("Reset Code sent Successfully");
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const verifyResetOTP = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(401).json("OTP is Required");
+    }
+    const resetUser = await User.findOne({ email });
+
+    if (resetUser.resetPasswordCode != otp) {
+      return res.status(400).json("Invalid OTP");
+    }
+
+    if (resetUser.resetCodeExpiry < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: "Code is Expired",
+      });
+    }
+    resetUser.resetPasswordCode = null;
+    resetUser.resetCodeExpiry = null;
+    resetUser.isOTPVerified = true;
+    await resetUser.save();
+
+    return res.status(201).json({
+      success: true,
+      message: "OTP Verified Successfully",
+    });
+  } catch (error) {
+    res.status(501).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { email, newPassword } = req.body;
+    const user = await resetPasswordService({ email, newPassword });
+
+    return res.status(201).json(user);
+  } catch (error) {
+    res.status(501).json({
+      success: false,
+      error: error.message,
+    });
+  }
+};
+
+export default {
+  signUP,
+  verifyEmail,
+  login,
+  resetOTP,
+  verifyResetOTP,
+  resetPassword,
+};
