@@ -11,7 +11,7 @@ import {
 const createUser = async (data) => {
   const existingUser = await User.findOne({ email: data.email });
   if (existingUser) {
-    throw { StatusCode: 400, message: "Email with this already exist" };
+    throw { statusCode: 400, message: "Email with this already exist" };
   }
 
   const generateCode = await generateVerificationCode();
@@ -23,7 +23,8 @@ const createUser = async (data) => {
     phoneNumber: data.phoneNumber,
     password: hashedPassword,
     address: data.address,
-    role: data.role || "Customer",
+    role: data.role || "User",
+    partnerOnBoardingSteps: 0,
     isLoggedIn: false,
     resetPasswordCode: null,
     resetCodeExpiry: null,
@@ -52,7 +53,7 @@ const loginService = async (data) => {
   const isMatch = await bcrypt.compare(data.password, user.password);
 
   if (!isMatch) {
-    throw { StatusCode: 404, message: "Invalid Credentials" };
+    throw { statusCode: 404, message: "Invalid Credentials" };
   }
 
   return user;

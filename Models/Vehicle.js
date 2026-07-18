@@ -4,25 +4,27 @@ const vehicleSchema = new mongoose.Schema(
   {
     owner: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: User,
-    },
-    licenseNumber: {
-      type: Number,
-      required: true,
-    },
-    experience: {
-      type: Number,
-      required: true,
+      ref: "User",
+      required: true
     },
     vehicleType: {
       type: String,
       enum: ["Bike", "Car", "Bus"],
+      required : true
+    },
+    vehicleNumber:{
+      type: String,
+      required: true,
+      unique: true
     },
     vehicleModel: {
       type: String,
+      default: null,
+      required : true
     },
     waitingCharge: {
       type: Number,
+      default: null
     },
     vehicleStatus: {
       type: String,

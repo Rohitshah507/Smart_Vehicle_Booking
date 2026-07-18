@@ -26,7 +26,7 @@ const uploadCloudinary = async (file) => {
           }
         },
       );
-      return uploadStream.end(file.buffer);
+      uploadStream.end(file.buffer);
     });
   } catch (error) {
     console.log(error);

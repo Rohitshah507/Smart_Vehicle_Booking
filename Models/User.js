@@ -34,14 +34,17 @@ const userSchema = new mongoose.Schema(
     address: {
       street: String,
       city: String,
-      state: String,
-      country: String,
-      postalCode: String,
     },
     role: {
       type: String,
-      enum: ["Customer", "Driver", "Admin"],
-      default: "Customer",
+      enum: ["User", "Partner", "Admin"],
+      default: "User",
+    },
+    partnerOnBoardingSteps: {
+      type: Number,
+      min: 0,
+      max: 8,
+      default: 0,
     },
     verificationCode: {
       type: Number,
